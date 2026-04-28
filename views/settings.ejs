@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+
+<h1>Настройки</h1>
+
+<div class="settings-grid">
+  <div class="settings-section">
+    <h2>Подключения</h2>
+
+    <div class="setting-item">
+      <div class="setting-label">Shopify магазин</div>
+      <div class="setting-value"><%= shopifyStore %></div>
+    </div>
+
+    <div class="setting-item">
+      <div class="setting-label">Allegro</div>
+      <div class="setting-value">
+        <% if (isAllegroConnected) { %>
+          <span class="status-ok">Подключено</span>
+          <span class="text-muted">Токен истекает: <%= tokenExpiresAt %></span>
+        <% } else { %>
+          <span class="status-error">Не подключено</span>
+        <% } %>
+      </div>
+      <div class="setting-action">
+        <a href="/auth/allegro" class="btn btn-sm"><%= isAllegroConnected ? 'Переподключить' : 'Подключить Allegro' %></a>
+      </div>
+    </div>
+  </div>
+<!--
+  <div class="settings-section">
+    <h2>Расписание синхронизации</h2>
+    <table class="table">
+      <thead>
+        <tr><th>Модуль</th><th>Интервал</th><th>Направление</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Остатки</td><td>Каждую минуту</td><td>Двусторонняя</td></tr>
+        <tr><td>Заказы</td><td>Каждую минуту</td><td>Allegro &rarr; Shopify</td></tr>
+        <tr><td>Товары</td><td>Каждую минуту</td><td>Сопоставление по SKU</td></tr>
+        <tr><td>Обновление токена</td><td>Каждые 11 часов</td><td>Allegro OAuth</td></tr>
+      </tbody>
+    </table>
+  </div> -->
+</div>
+
+<%- include('partials/footer') %>

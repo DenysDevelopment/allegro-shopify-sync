@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+<% if (success) { %>
+  <div class="alert alert-success">
+    <% if (success === 'shopify_auth_complete') { %>Shopify OAuth успешно подключён!
+    <% } else if (success === 'allegro_auth_complete') { %>Allegro OAuth успешно подключён!
+    <% } else { %><%= success %><% } %>
+  </div>
+<% } %>
+<% if (error) { %>
+  <div class="alert alert-error">Ошибка: <%= error %></div>
+<% } %>
+
+<h1>Панель управления</h1>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Shopify</div>
+    <% if (stats.shopifyConnected) { %>
+      <div class="stat-value status-ok">Подключено</div>
+      <div class="stat-detail"><%= stats.shopifyStore %></div>
+    <% } else { %>
+      <div class="stat-value status-error">Не подключено</div>
+      <div class="stat-detail"><a href="/auth/shopify" class="btn btn-sm">Подключить Shopify</a></div>
+    <% } %>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Allegro</div>
+    <% if (stats.tokenStatus && stats.tokenStatus.expires_at > Date.now() / 1000) { %>
+      <div class="stat-value status-ok">Подключено</div>
+      <div class="stat-detail">Токен истекает: <%= new Date(stats.tokenStatus.expires_at * 1000).toLocaleString() %></div>
+    <% } else { %>
+      <div class="stat-value status-error">Не подключено</div>
+      <div class="stat-detail"><a href="/auth/allegro" class="btn btn-sm">Подключить Allegro</a></div>
+    <% } %>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Товары</div>
+    <div class="stat-value"><%= stats.activeProducts %></div>
+    <div class="stat-detail">
+      Активные: <%= stats.activeProducts %> | Устаревшие: <%= stats.staleProducts %> | Ошибки: <%= stats.errorProducts %> | Ожидание: <%= stats.pendingProducts %>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Заказы</div>
+    <div class="stat-value"><%= stats.totalOrders %></div>
+    <div class="stat-detail">
+      За 24ч: <%= stats.recentOrders %> | Доход: <%= stats.orderRevenue.toFixed(2) %> PLN
+    </div>
+  </div>
+</div>
+
+<h2>Последняя синхронизация</h2>
+<div class="stats-grid">
+  <div class="stat-card stat-card-sm">
+    <div class="stat-label">Товары</div>
+    <div class="stat-detail"><%= stats.lastSync.products?.created_at || 'Никогда' %></div>
+  </div>
+  <div class="stat-card stat-card-sm">
+    <div class="stat-label">Остатки</div>
+    <div class="stat-detail"><%= stats.lastSync.inventory?.created_at || 'Никогда' %></div>
+  </div>
+  <div class="stat-card stat-card-sm">
+    <div class="stat-label">Заказы</div>
+    <div class="stat-detail"><%= stats.lastSync.orders?.created_at || 'Никогда' %></div>
+  </div>
+</div>
+
+<h2>Ручная синхронизация</h2>
+<div class="actions-bar">
+  <button class="btn" data-trigger-sync="products">Синхр. товары</button>
+  <button class="btn" data-trigger-sync="inventory">Синхр. остатки</button>
+  <button class="btn" data-trigger-sync="orders">Синхр. заказы</button>
+</div>
+
+<% if (stats.recentErrors.length > 0) { %>
+  <h2>Последние ошибки</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Время</th>
+        <th>Тип</th>
+        <th>Направление</th>
+        <th>Объект</th>
+        <th>Сообщение</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% stats.recentErrors.forEach(err => { %>
+        <tr>
+          <td><%= err.created_at %></td>
+          <td><span class="badge badge-<%= err.sync_type %>"><%= err.sync_type %></span></td>
+          <td><%= err.direction %></td>
+          <td><%= err.entity_id %></td>
+          <td class="text-error"><%= err.message %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('partials/footer') %>

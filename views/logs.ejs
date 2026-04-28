@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+
+<h1>Консоль логов</h1>
+
+<div class="logs-toolbar">
+  <div class="filters">
+    <button class="btn btn-sm btn-active" data-log-level="all">Все</button>
+    <button class="btn btn-sm" data-log-level="info">INFO</button>
+    <button class="btn btn-sm" data-log-level="warn">WARN</button>
+    <button class="btn btn-sm" data-log-level="error">ERROR</button>
+    <span style="margin: 0 8px; color: var(--text-muted);">|</span>
+    <input type="text" id="log-search" class="log-search-input" placeholder="Поиск..." />
+    <span style="margin: 0 8px; color: var(--text-muted);">|</span>
+    <label class="log-autoscroll-label">
+      <input type="checkbox" id="log-autoscroll" checked /> Автопрокрутка
+    </label>
+    <span id="log-count" style="margin-left: auto; color: var(--text-muted); font-size: 13px;"></span>
+  </div>
+</div>
+
+<div class="log-container" id="log-container">
+  <pre id="log-output" class="log-output">Загрузка логов...</pre>
+</div>
+
+<%- include('partials/footer') %>

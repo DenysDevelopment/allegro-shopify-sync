@@ -1,0 +1,25 @@
+{
+  "name": "gurulinker",
+  "version": "1.0.0",
+  "description": "Shopify ↔ Allegro Bridge — bidirectional e-commerce sync",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "register-webhooks": "node scripts/register-webhooks.js",
+    "test-connection": "node scripts/test-connection.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "better-sqlite3": "^11.0.0",
+    "dotenv": "^16.4.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "node-cron": "^3.0.3",
+    "uuid": "^10.0.0",
+    "winston": "^3.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

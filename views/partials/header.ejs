@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GuruLINKER</title>
+		<link rel="stylesheet" href="/css/style.css" />
+	</head>
+	<body>
+		<nav class="navbar">
+			<div class="nav-brand">
+				<span class="nav-title">GuruLINKER</span>
+			</div>
+			<ul class="nav-links">
+				<li>
+					<a
+						href="/dashboard"
+						class="<%= page === 'dashboard' ? 'active' : '' %>"
+						>Панель</a
+					>
+				</li>
+				<li>
+					<a
+						href="/dashboard/products"
+						class="<%= page === 'products' ? 'active' : '' %>"
+						>Товары</a
+					>
+				</li>
+				<li>
+					<a
+						href="/dashboard/orders"
+						class="<%= page === 'orders' ? 'active' : '' %>"
+						>Заказы</a
+					>
+				</li>
+				<li>
+					<a
+						href="/dashboard/sync-log"
+						class="<%= page === 'sync-log' ? 'active' : '' %>"
+						>История</a
+					>
+				</li>
+				<li>
+					<a
+						href="/dashboard/logs"
+						class="<%= page === 'logs' ? 'active' : '' %>"
+						>Логи</a
+					>
+				</li>
+				<li>
+					<a
+						href="/dashboard/settings"
+						class="<%= page === 'settings' ? 'active' : '' %>"
+						>Настройки</a
+					>
+				</li>
+			</ul>
+		</nav>
+		<main class="container">

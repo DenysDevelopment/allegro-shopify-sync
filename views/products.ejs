@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+<h1>Товары (<%= total %>)</h1>
+
+<div class="filters">
+  <a href="/dashboard/products" class="btn btn-sm <%= statusFilter === 'all' ? 'btn-active' : '' %>">Все</a>
+  <a href="/dashboard/products?status=active" class="btn btn-sm <%= statusFilter === 'active' ? 'btn-active' : '' %>">Активные</a>
+  <a href="/dashboard/products?status=error" class="btn btn-sm <%= statusFilter === 'error' ? 'btn-active' : '' %>">Ошибки</a>
+  <a href="/dashboard/products?status=pending" class="btn btn-sm <%= statusFilter === 'pending' ? 'btn-active' : '' %>">Ожидание</a>
+</div>
+
+<% if (products.length === 0) { %>
+  <div class="empty-state">
+    <p>Товары не найдены. Запустите синхронизацию для начала работы.</p>
+    <button class="btn" data-trigger-sync="products">Синхронизировать сейчас</button>
+  </div>
+<% } else { %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Shopify товар</th>
+        <th>Shopify вариант</th>
+        <th>Allegro оффер</th>
+        <th>Категория</th>
+        <th>Статус</th>
+        <th>Последняя синхр.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.forEach(p => { %>
+        <tr>
+          <td><%= p.shopify_product_id %></td>
+          <td><%= p.shopify_variant_id %></td>
+          <td>
+            <% if (p.allegro_offer_id) { %>
+              <a href="https://allegro.pl/oferta/<%= p.allegro_offer_id %>" target="_blank"><%= p.allegro_offer_id %></a>
+            <% } else { %>
+              —
+            <% } %>
+          </td>
+          <td><%= p.allegro_category_id || '—' %></td>
+          <td>
+            <span class="badge badge-<%= p.status %>"><%= p.status %></span>
+          </td>
+          <td><%= p.last_synced_at || '—' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="/dashboard/products?page=<%= currentPage - 1 %>&status=<%= statusFilter %>" class="btn btn-sm">&laquo; Назад</a>
+      <% } %>
+      <span class="page-info">Страница <%= currentPage %> из <%= totalPages %></span>
+      <% if (currentPage < totalPages) { %>
+        <a href="/dashboard/products?page=<%= currentPage + 1 %>&status=<%= statusFilter %>" class="btn btn-sm">Далее &raquo;</a>
+      <% } %>
+    </div>
+  <% } %>
+<% } %>
+
+<% if (unmatchedShopify.length > 0) { %>
+  <h2>Не найдены на Allegro (<%= unmatchedShopify.length %>)</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Название товара (Shopify)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% unmatchedShopify.forEach(u => { %>
+        <tr>
+          <td><strong><%= u.sku %></strong></td>
+          <td><%= u.product_title || '—' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<% if (unmatchedAllegro.length > 0) { %>
+  <h2>Не найдены в Shopify (<%= unmatchedAllegro.length %>)</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Название оффера (Allegro)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% unmatchedAllegro.forEach(u => { %>
+        <tr>
+          <td><strong><%= u.sku %></strong></td>
+          <td><%= u.offer_name || '—' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('partials/footer') %>

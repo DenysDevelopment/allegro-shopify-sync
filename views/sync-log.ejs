@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+
+<h1>Журнал синхронизации</h1>
+
+<div class="filters">
+  <strong>Тип:</strong>
+  <a href="/dashboard/sync-log?type=all&status=<%= statusFilter %>" class="btn btn-sm <%= typeFilter === 'all' ? 'btn-active' : '' %>">Все</a>
+  <a href="/dashboard/sync-log?type=products&status=<%= statusFilter %>" class="btn btn-sm <%= typeFilter === 'products' ? 'btn-active' : '' %>">Товары</a>
+  <a href="/dashboard/sync-log?type=prices&status=<%= statusFilter %>" class="btn btn-sm <%= typeFilter === 'prices' ? 'btn-active' : '' %>">Цены</a>
+  <a href="/dashboard/sync-log?type=inventory&status=<%= statusFilter %>" class="btn btn-sm <%= typeFilter === 'inventory' ? 'btn-active' : '' %>">Остатки</a>
+  <a href="/dashboard/sync-log?type=orders&status=<%= statusFilter %>" class="btn btn-sm <%= typeFilter === 'orders' ? 'btn-active' : '' %>">Заказы</a>
+
+  <span class="filter-sep">|</span>
+
+  <strong>Статус:</strong>
+  <a href="/dashboard/sync-log?type=<%= typeFilter %>&status=all" class="btn btn-sm <%= statusFilter === 'all' ? 'btn-active' : '' %>">Все</a>
+  <a href="/dashboard/sync-log?type=<%= typeFilter %>&status=success" class="btn btn-sm <%= statusFilter === 'success' ? 'btn-active' : '' %>">Успешно</a>
+  <a href="/dashboard/sync-log?type=<%= typeFilter %>&status=error" class="btn btn-sm <%= statusFilter === 'error' ? 'btn-active' : '' %>">Ошибки</a>
+</div>
+
+<% if (logs.length === 0) { %>
+  <div class="empty-state">
+    <p>Записей не найдено для выбранных фильтров.</p>
+  </div>
+<% } else { %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Время</th>
+        <th>Тип</th>
+        <th>Направление</th>
+        <th>ID объекта</th>
+        <th>Статус</th>
+        <th>Сообщение</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% logs.forEach(log => { %>
+        <tr class="<%= log.status === 'error' ? 'row-error' : '' %>">
+          <td class="nowrap"><%= log.created_at %></td>
+          <td><span class="badge badge-<%= log.sync_type %>"><%= log.sync_type %></span></td>
+          <td><%= log.direction %></td>
+          <td><%= log.entity_id || '—' %></td>
+          <td>
+            <span class="badge badge-<%= log.status %>"><%= log.status %></span>
+          </td>
+          <td class="msg-cell"><%= log.message || '—' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <p class="text-muted">Показаны последние 200 записей</p>
+<% } %>
+
+<%- include('partials/footer') %>

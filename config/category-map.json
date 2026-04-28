@@ -1,0 +1,26 @@
+{
+  "default_category_id": "257931",
+  "default_shipping_rate_id": "",
+  "default_return_policy_id": "",
+  "default_implied_warranty_id": "",
+  "default_location": {
+    "countryCode": "PL",
+    "province": "MAZOWIECKIE",
+    "city": "Warszawa",
+    "postCode": "00-001"
+  },
+  "mappings": [
+    {
+      "shopify_product_type": "Example",
+      "allegro_category_id": "257931",
+      "parameter_map": [
+        {
+          "shopify_field": "vendor",
+          "allegro_param_id": "127448",
+          "allegro_param_name": "Marka",
+          "value_map": {}
+        }
+      ]
+    }
+  ]
+}

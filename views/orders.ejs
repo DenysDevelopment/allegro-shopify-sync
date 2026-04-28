@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+<h1>Заказы (<%= total %>)</h1>
+
+<% if (orders.length === 0) { %>
+  <div class="empty-state">
+    <p>Заказов пока нет. Заказы импортируются автоматически из Allegro каждую минуту.</p>
+    <button class="btn" data-trigger-sync="orders">Импортировать сейчас</button>
+  </div>
+<% } else { %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Allegro заказ</th>
+        <th>Shopify заказ</th>
+        <th>Email покупателя</th>
+        <th>Сумма (PLN)</th>
+        <th>Статус</th>
+        <th>Импортирован</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.forEach(o => { %>
+        <tr>
+          <td><%= o.allegro_order_id %></td>
+          <td>
+            <% if (o.shopify_order_id) { %>
+              #<%= o.shopify_order_id %>
+            <% } else { %>
+              —
+            <% } %>
+          </td>
+          <td><%= o.buyer_email || '—' %></td>
+          <td><%= o.total_amount ? o.total_amount.toFixed(2) : '0.00' %></td>
+          <td>
+            <span class="badge badge-<%= o.status %>"><%= o.status %></span>
+          </td>
+          <td><%= o.created_at %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="/dashboard/orders?page=<%= currentPage - 1 %>" class="btn btn-sm">&laquo; Назад</a>
+      <% } %>
+      <span class="page-info">Страница <%= currentPage %> из <%= totalPages %></span>
+      <% if (currentPage < totalPages) { %>
+        <a href="/dashboard/orders?page=<%= currentPage + 1 %>" class="btn btn-sm">Далее &raquo;</a>
+      <% } %>
+    </div>
+  <% } %>
+<% } %>
+
+<%- include('partials/footer') %>
