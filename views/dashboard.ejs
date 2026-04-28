@@ -76,6 +76,46 @@
   <button class="btn" data-trigger-sync="orders">Синхр. заказы</button>
 </div>
 
+<% if (stats.recentShopifyToAllegro && stats.recentShopifyToAllegro.length > 0) { %>
+  <h2>Продажи Shopify → Allegro</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Время</th>
+        <th>Событие</th>
+        <th>Заказ</th>
+        <th>SKU</th>
+        <th>Allegro Offer</th>
+        <th>Δ</th>
+        <th>Сток</th>
+        <th>Статус</th>
+        <th>Сообщение</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% stats.recentShopifyToAllegro.forEach(row => { %>
+        <tr>
+          <td><%= row.created_at %></td>
+          <td><span class="badge"><%= row.event_type %></span></td>
+          <td><%= row.shopify_order_id %></td>
+          <td><%= row.sku || '—' %></td>
+          <td><%= row.allegro_offer_id || '—' %></td>
+          <td><%= row.quantity_change %></td>
+          <td>
+            <% if (row.allegro_stock_before !== null && row.allegro_stock_after !== null) { %>
+              <%= row.allegro_stock_before %> → <%= row.allegro_stock_after %>
+            <% } else { %>—<% } %>
+          </td>
+          <td class="<%= row.status === 'success' ? 'text-ok' : (row.status === 'error' ? 'text-error' : '') %>">
+            <%= row.status %>
+          </td>
+          <td><%= row.message || '' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
 <% if (stats.recentErrors.length > 0) { %>
   <h2>Последние ошибки</h2>
   <table class="table">

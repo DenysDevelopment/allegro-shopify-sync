@@ -24,6 +24,9 @@ router.get('/', (req, res) => {
     tokenStatus: db.prepare('SELECT expires_at FROM allegro_tokens WHERE id = 1').get(),
     shopifyConnected: !!db.prepare('SELECT access_token FROM shopify_tokens WHERE id = 1').get()?.access_token || !!process.env.SHOPIFY_ACCESS_TOKEN,
     shopifyStore: process.env.SHOPIFY_STORE || 'Not configured',
+    recentShopifyToAllegro: db.prepare(
+      'SELECT * FROM shopify_order_sync ORDER BY created_at DESC LIMIT 20'
+    ).all(),
   };
 
   res.render('dashboard', {

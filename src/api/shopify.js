@@ -99,6 +99,11 @@ class ShopifyClient {
     return res.data.inventory_level;
   }
 
+  async getOrder(orderId) {
+    const res = await this._request('get', `/orders/${orderId}.json`, undefined, `Shopify getOrder ${orderId}`);
+    return res.data.order;
+  }
+
   async createDraftOrder(orderData) {
     const res = await this._request('post', '/draft_orders.json', orderData, 'Shopify createDraftOrder');
     return res.data.draft_order;

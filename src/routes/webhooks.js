@@ -4,6 +4,7 @@ const router = express.Router();
 const logger = require('../utils/logger');
 const productSync = require('../sync/products');
 const inventorySync = require('../sync/inventory');
+const shopifyOrders = require('../sync/shopify-orders');
 
 // HMAC verification middleware for Shopify webhooks
 function verifyShopifyWebhook(req, res, next) {
@@ -71,6 +72,45 @@ router.post('/inventory_levels-update', verifyShopifyWebhook, async (req, res) =
     await inventorySync.syncSingleItem(inventory_item_id, available);
   } catch (err) {
     logger.error(`Webhook inventory sync error: ${err.message}`);
+  }
+});
+
+// Order paid → decrement Allegro stock for mapped line items
+router.post('/orders-paid', verifyShopifyWebhook, async (req, res) => {
+  res.status(200).send('OK');
+  const order = req.body;
+  logger.info(`Webhook: order paid ${order?.id} (${order?.line_items?.length || 0} items)`);
+
+  try {
+    await shopifyOrders.handleOrderPaid(order);
+  } catch (err) {
+    logger.error(`Webhook orders/paid error: ${err.message}`);
+  }
+});
+
+// Order cancelled → restore Allegro stock for previously decremented items
+router.post('/orders-cancelled', verifyShopifyWebhook, async (req, res) => {
+  res.status(200).send('OK');
+  const order = req.body;
+  logger.info(`Webhook: order cancelled ${order?.id}`);
+
+  try {
+    await shopifyOrders.handleOrderCancelled(order);
+  } catch (err) {
+    logger.error(`Webhook orders/cancelled error: ${err.message}`);
+  }
+});
+
+// Refund created → restore Allegro stock for refunded quantities
+router.post('/refunds-create', verifyShopifyWebhook, async (req, res) => {
+  res.status(200).send('OK');
+  const refund = req.body;
+  logger.info(`Webhook: refund created order=${refund?.order_id}`);
+
+  try {
+    await shopifyOrders.handleRefundCreated(refund);
+  } catch (err) {
+    logger.error(`Webhook refunds/create error: ${err.message}`);
   }
 });
 

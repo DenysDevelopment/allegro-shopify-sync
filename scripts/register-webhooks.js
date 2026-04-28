@@ -13,6 +13,9 @@ const WEBHOOK_TOPICS = [
   { topic: 'products/update', path: '/webhooks/products-update' },
   { topic: 'products/delete', path: '/webhooks/products-delete' },
   { topic: 'inventory_levels/update', path: '/webhooks/inventory_levels-update' },
+  { topic: 'orders/paid', path: '/webhooks/orders-paid' },
+  { topic: 'orders/cancelled', path: '/webhooks/orders-cancelled' },
+  { topic: 'refunds/create', path: '/webhooks/refunds-create' },
 ];
 
 async function registerWebhooks() {
