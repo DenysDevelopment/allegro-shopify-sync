@@ -1,0 +1,74 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Prevent overlapping deploys racing on the same server
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Syntax & schema check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check JS syntax
+        run: |
+          set -e
+          while IFS= read -r f; do
+            node --check "$f"
+          done < <(find . -path ./node_modules -prune -o -name "*.js" -print)
+
+      - name: Check SQL schema
+        run: sqlite3 :memory: < db/schema.sql
+
+  deploy:
+    name: SSH deploy
+    needs: check
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            echo "→ Fetching latest code"
+            git fetch origin main
+            git pull --ff-only origin main
+
+            echo "→ Installing prod dependencies"
+            npm ci --omit=dev
+
+            echo "→ Reloading PM2"
+            if pm2 describe gurulinker > /dev/null 2>&1; then
+              pm2 reload ecosystem.config.js --update-env
+            else
+              pm2 start ecosystem.config.js --env production
+            fi
+            pm2 save
+
+            echo "→ Registering Shopify webhooks (idempotent)"
+            npm run register-webhooks || echo "WARN: register-webhooks failed; check manually"
+
+            echo "✓ Deployed $(git rev-parse --short HEAD)"
